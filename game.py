@@ -1,13 +1,20 @@
 #Programa para acender os LEDs individualmente na cor desejada
 
 # Importação das Bibliotecas: Importa as bibliotecas Pin e neopixel necessárias para controlar os LEDs.
+# lib
 from machine import Pin
 import neopixel
-import time
+
+# lib
+from utime import ticks_us
+
+# lib
+import random
 
 # Configuração inicial
 
 # Número de LEDs na sua matriz 5x5
+# lib / aula
 NUM_LEDS = 25
 ROW_SIZE = 5
 COL_SIZE = 5
@@ -15,11 +22,12 @@ COL_SIZE = 5
 # Inicializar a matriz de NeoPixels no GPIO7
 # A Raspberry Pi Pico está conectada à matriz de NeoPixels no pino GPIO7
 
+# lib
 LED_MAP = [[04, 03, 02, 01, 00],
-               [05, 06, 07, 08, 09],
-               [14, 13, 12, 11, 10],
-               [15, 16, 17, 18, 19],
-               [24, 23, 22, 21, 20]]
+           [05, 06, 07, 08, 09],
+           [14, 13, 12, 11, 10],
+           [15, 16, 17, 18, 19],
+           [24, 23, 22, 21, 20]]
 
 class Leds:
     def __init__(self):
@@ -46,34 +54,15 @@ class Leds:
             print("Índice x fora do intervalo. Por favor, escolha um índice de 0 a", NUM_LEDS - 1)
             return
 
-        print('y',y)
-        print('x',x)
         indice = LED_MAP[y][x]
         self.np[indice] = (0,0,0)  # Define a cor do LED específico
         self.np.write()  # Atualiza a matriz de LEDs para aplicar a mudança
 
-m = Leds()
-m.acender_led(2,0,(1,0,0))
-jogador_pos = [2,0]
+def numero_aleatorio(numero1, numero2):
+    return random.randint(numero1, numero2)
 
 button_a = Pin(5, Pin.IN, Pin.PULL_UP)
 button_b = Pin(6, Pin.IN, Pin.PULL_UP)
-
-def jogador_esq():
-    x, y = jogador_pos
-    if x <= 0: return
-    m.apagar_led(x, y)
-    jogador_pos[0] -= 1
-    x, y = jogador_pos
-    m.acender_led(x,y,(1,0,0))
-
-def jogador_direita():
-    x, y = jogador_pos
-    if x >= ROW_SIZE - 1: return
-    m.apagar_led(x, y)
-    jogador_pos[0] += 1
-    x, y = jogador_pos
-    m.acender_led(x,y,(1,0,0))
 
 button_a_a = 1
 button_b_a = 1
@@ -96,8 +85,83 @@ def botao_b():
     button_b_a = b
     return r
 
-while True:
+def tempo_de_jogo(old):
+    new = ticks_us()
+    delta = abs(new - old)
+    old = new
+    return (delta, old)
+
+def loop(func):
+    old = ticks_us()
+    while True:
+        delta, old = tempo_de_jogo(old)
+        func(delta)
+
+
+# aula
+
+m = Leds()
+m.acender_led(2,0,(0,0,1))
+jogador_pos = [2,0]
+
+def jogador_esq():
+    x, y = jogador_pos
+    if x <= 0:
+        return
+    m.apagar_led(x, y)
+    jogador_pos[0] -= 1
+    x, y = jogador_pos
+    m.acender_led(x,y,(0,0,1))
+
+def jogador_direita():
+    x, y = jogador_pos
+    if x >= ROW_SIZE - 1:
+        return
+    m.apagar_led(x, y)
+    jogador_pos[0] += 1
+    x, y = jogador_pos
+    m.acender_led(x,y,(0,0,1))
+
+def acender_linha(buraco, arvore_y):
+    i = 0
+    while i < 5:
+        if i != buraco:
+            m.acender_led(i, arvore_y, (0,1,0))
+        i = i + 1
+
+def apagar_linha(buraco, y):
+    i = 0
+    while i < 5:
+        if i != buraco:
+            m.apagar_led(i, y)
+        i = i + 1
+
+# inicializar arvore
+arvore_gap = numero_aleatorio(0,4)
+arvore_y = 4.999999
+acender_linha(arvore_gap, int(arvore_y))
+
+
+def mover_arvore(x):
+    global arvore_y
+    global arvore_gap
+    dist = x/250_000
+    apagar_linha(arvore_gap, int(arvore_y))
+    arvore_y = arvore_y - dist
+    if arvore_y < 0:
+        arvore_gap = numero_aleatorio(0,4)
+        arvore_y = 4.99999
+        return
+    acender_linha(arvore_gap, int(arvore_y))
+
+def jogo(delta):
+    global arvore_y
+    global arvore_gap
+    mover_arvore(delta)
+    print(arvore_y)
     if botao_a():
         jogador_esq()
     if botao_b():
         jogador_direita()
+
+loop(jogo)
