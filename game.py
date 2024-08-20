@@ -3,6 +3,7 @@
 # Importação das Bibliotecas: Importa as bibliotecas Pin e neopixel necessárias para controlar os LEDs.
 from machine import Pin
 import neopixel
+import time
 
 # Configuração inicial
 
@@ -60,24 +61,27 @@ button_b = Pin(6, Pin.IN, Pin.PULL_UP)
 
 def jogador_esq():
     x, y = jogador_pos
-    if x >= ROW_SIZE - 1: return
+    if x <= 0: return
     m.apagar_led(x, y)
     jogador_pos[0] -= 1
+    x, y = jogador_pos
+    m.acender_led(x,y,(1,0,0))
 
 def jogador_direita():
     x, y = jogador_pos
-    if x <= 0: return
+    if x >= ROW_SIZE - 1: return
     m.apagar_led(x, y)
     jogador_pos[0] += 1
     x, y = jogador_pos
     m.acender_led(x,y,(1,0,0))
-    
+
 
 while True:
     if button_a.value() == 0:
         print('A')
         jogador_esq()
+        time.sleep(.25)
     if button_b.value() == 0:
         print('B')
         jogador_direita()
-
+        time.sleep(.25)
