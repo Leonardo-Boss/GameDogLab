@@ -98,6 +98,15 @@ def loop(func):
         func(delta)
 
 
+def limpar_tela():
+    i = 0
+    while i < 5:
+        j = 0
+        while j < 5:
+            m.apagar_led(i,j)
+            j = j + 1
+        i = i + 1
+
 # aula
 
 m = Leds()
@@ -141,6 +150,16 @@ arvore_gap = numero_aleatorio(0,4)
 arvore_y = 4.999999
 acender_linha(arvore_gap, int(arvore_y))
 
+def inicializar_arvore():
+    global arvore_gap
+    global arvore_y
+    arvore_gap = numero_aleatorio(0,4)
+    arvore_y = 4.999999
+
+def inicializar_jogador():
+    global jogador_pos
+    m.acender_led(2,0,(0,0,1))
+    jogador_pos = [2,0]
 
 def mover_arvore(x):
     global arvore_y
@@ -149,19 +168,33 @@ def mover_arvore(x):
     apagar_linha(arvore_gap, int(arvore_y))
     arvore_y = arvore_y - dist
     if arvore_y < 0:
-        arvore_gap = numero_aleatorio(0,4)
-        arvore_y = 4.99999
+        inicializar_arvore()
         return
     acender_linha(arvore_gap, int(arvore_y))
 
+def morreu():
+    x,y = jogador_pos
+    if x != arvore_gap and y == int(arvore_y):
+        return True
+    else:
+        return False
+
 def jogo(delta):
+    if morreu():
+        x, y = jogador_pos
+        m.acender_led(x, y, (1, 0, 0))
+        if botao_a() or botao_b():
+            limpar_tela()
+            inicializar_arvore()
+            inicializar_jogador()
+        return
     global arvore_y
     global arvore_gap
     mover_arvore(delta)
-    print(arvore_y)
     if botao_a():
         jogador_esq()
     if botao_b():
         jogador_direita()
+
 
 loop(jogo)
