@@ -75,13 +75,29 @@ def jogador_direita():
     x, y = jogador_pos
     m.acender_led(x,y,(1,0,0))
 
+button_a_a = 1
+button_b_a = 1
+
+def botao_a():
+    global button_a_a
+    r = False
+    a = button_a.value()
+    if a == 0 and button_a_a != a:
+        r = True
+    button_a_a = a
+    return r
+
+def botao_b():
+    global button_b_a
+    r = False
+    b = button_b.value()
+    if b == 0 and button_b_a != b:
+        r = True
+    button_b_a = b
+    return r
 
 while True:
-    if button_a.value() == 0:
-        print('A')
+    if botao_a():
         jogador_esq()
-        time.sleep(.25)
-    if button_b.value() == 0:
-        print('B')
+    if botao_b():
         jogador_direita()
-        time.sleep(.25)
