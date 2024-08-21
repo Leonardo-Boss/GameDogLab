@@ -1,15 +1,46 @@
-#Programa para acender os LEDs individualmente na cor desejada
 
 # Importação das Bibliotecas: Importa as bibliotecas Pin e neopixel necessárias para controlar os LEDs.
 # lib
-from machine import Pin
+from machine import Pin, SoftI2C, PWM
 import neopixel
+from ssd1306 import SSD1306_I2C
 
 # lib
 from utime import ticks_us
+import time
 
 # lib
 import random
+
+# Configuração OLED
+i2c = SoftI2C(scl=Pin(15), sda=Pin(14))
+oled = SSD1306_I2C(128, 64, i2c)
+
+def limpar_display():
+    oled.fill(0)
+
+def escrever_display(texto, x, y):
+    oled.text(texto, x, y)
+
+def mostrar_display():
+    oled.show()
+
+def som_morreu():
+    buzzer = PWM(Pin(21))
+    
+    # Sequência de notas
+    melody = [200, 50]
+    
+    # Ritmo para cada nota
+    tempo = [50, 50, 50, 50]  # tempo em milissegundos
+    
+    # Reprodução das notas
+    for i in range(len(melody)):
+        buzzer.freq(melody[i])
+        buzzer.duty_u16(20000)
+        time.sleep(tempo[i] / 1000)
+        buzzer.duty_u16(0)
+        time.sleep(10 / 1000)  # pausa breve entre as notas
 
 # Configuração inicial
 
@@ -97,7 +128,6 @@ def loop(func):
         delta, old = tempo_de_jogo(old)
         func(delta)
 
-
 def limpar_tela():
     i = 0
     while i < 5:
@@ -153,13 +183,20 @@ acender_linha(arvore_gap, int(arvore_y))
 def inicializar_arvore():
     global arvore_gap
     global arvore_y
+    global score
+    global hiscore
     arvore_gap = numero_aleatorio(0,4)
     arvore_y = 4.999999
+    score = score + 1
+    if score > hiscore:
+        hiscore = score
 
 def inicializar_jogador():
     global jogador_pos
+    global score
     m.acender_led(2,0,(0,0,1))
     jogador_pos = [2,0]
+    score = -1
 
 def mover_arvore(x):
     global arvore_y
@@ -179,15 +216,35 @@ def morreu():
     else:
         return False
 
+def pontuou():
+    x, y = jogador_pos
+    if y == int(arvore_y):
+        return True
+    return False
+
+score = 0
+morto = False
+hiscore = 0
+
 def jogo(delta):
+    global score
+    global morto
     if morreu():
         x, y = jogador_pos
         m.acender_led(x, y, (1, 0, 0))
+        if not morto:
+            som_morreu()
+        morto = True
         if botao_a() or botao_b():
+            morto = False
             limpar_tela()
-            inicializar_arvore()
             inicializar_jogador()
+            inicializar_arvore()
         return
+    limpar_display()
+    escrever_display("score: " + str(score),0,0)
+    escrever_display("hiscore: " + str(hiscore),0,10)
+    mostrar_display()
     global arvore_y
     global arvore_gap
     mover_arvore(delta)
