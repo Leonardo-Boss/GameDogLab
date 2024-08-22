@@ -1,6 +1,7 @@
 from BitDogLib import *
 
 TAMANHO_LINHA = 5
+HIGHSCORE_FILE = 'highscore.txt'
 
 def ligar_linha(buraco, arvore_y):
     i = 0
@@ -21,7 +22,11 @@ ligar_led(2,0,(0,0,1))
 jogador_pos = [2,0]
 score = 0
 morto = False
-hiscore = 0
+hiscore = ler_arquivo(HIGHSCORE_FILE)
+if hiscore == '':
+    hiscore = 0
+else:
+    hiscore = int(hiscore)
 
 # inicializar arvore
 arvore_gap = numero_aleatorio(0,4)
@@ -106,6 +111,7 @@ def jogo(delta):
         ligar_led(x, y, (1, 0, 0))
         if not morto:
             som_morreu()
+            escrever_arquivo(HIGHSCORE_FILE, str(hiscore))
         morto = True
         if botao_a() or botao_b():
             morto = False

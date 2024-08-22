@@ -2,6 +2,18 @@ from utime import ticks_us
 import random
 
 
+def ler_arquivo(nome):
+    try:
+        with open(nome, 'r') as f:
+            mensagem = int(f.read())
+    except:
+       mensagem  = ''
+    return mensagem
+
+def escrever_arquivo(nome, mensagem):
+    with open(nome, 'w') as f:
+        f.write(mensagem)
+
 def numero_aleatorio(numero1, numero2):
     return random.randint(numero1, numero2)
 
