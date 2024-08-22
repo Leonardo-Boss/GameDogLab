@@ -1,5 +1,18 @@
 from BitDogLib import *
 
+# TODO: trocar jogador_pos por jogador_x e jogador_y
+# TODO: remover += -= e outros sugar syntax se tiver
+
+# Conhecimentos necessários
+# - funções
+# - while
+# - if
+# - variaveis
+# - escopo global e local
+# - tipos de dados
+# - lógica booleana
+# - listas
+
 TAMANHO_LINHA = 5
 HIGHSCORE_FILE = 'highscore.txt'
 
@@ -7,7 +20,7 @@ def ligar_linha(buraco, arvore_y):
     i = 0
     while i < TAMANHO_LINHA:
         if i != buraco:
-            ligar_led(i, arvore_y, (0,1,0))
+            ligar_led(i, arvore_y, [0,1,0])
         i = i + 1
 
 def apagar_linha(buraco, y):
@@ -18,15 +31,15 @@ def apagar_linha(buraco, y):
         i = i + 1
 
 # inicializar jogador
-ligar_led(2,0,(0,0,1))
+ligar_led(2,0,[0,0,1])
 jogador_pos = [2,0]
 score = 0
 morto = False
-hiscore = ler_arquivo(HIGHSCORE_FILE)
-if hiscore == '':
+texto_arquivo = ler_arquivo(HIGHSCORE_FILE)
+if texto_arquivo == '':
     hiscore = 0
 else:
-    hiscore = int(hiscore)
+    hiscore = int(texto_arquivo)
 
 # inicializar arvore
 arvore_gap = numero_aleatorio(0,4)
@@ -49,7 +62,7 @@ def jogador_esq():
     apagar_led(x, y)
     jogador_pos[0] -= 1
     x, y = jogador_pos
-    ligar_led(x,y,(0,0,1))
+    ligar_led(x,y,[0,0,1])
 
 def jogador_direita():
     x, y = jogador_pos
@@ -58,7 +71,7 @@ def jogador_direita():
     apagar_led(x, y)
     jogador_pos[0] += 1
     x, y = jogador_pos
-    ligar_led(x,y,(0,0,1))
+    ligar_led(x,y,[0,0,1])
 
 
 def inicializar_arvore():
@@ -75,7 +88,7 @@ def inicializar_arvore():
 def inicializar_jogador():
     global jogador_pos
     global score
-    ligar_led(2,0,(0,0,1))
+    ligar_led(2,0,[0,0,1])
     jogador_pos = [2,0]
     score = -1
 
@@ -108,7 +121,7 @@ def jogo(delta):
     global morto
     if morreu():
         x, y = jogador_pos
-        ligar_led(x, y, (1, 0, 0))
+        ligar_led(x, y, [1, 0, 0])
         if not morto:
             som_morreu()
             escrever_arquivo(HIGHSCORE_FILE, str(hiscore))
