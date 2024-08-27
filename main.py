@@ -9,24 +9,30 @@ from BitDogLib import *
 # - lógica booleana
 # - listas
 
-TAMANHO_LINHA = 5
+TOTAL_COLUNAS = 5
+TOTAL_LINHAS = 5
 HIGHSCORE_FILE = 'highscore.txt'
+
+# criamos uma variaveis para guardar as core
+AZUL = [0, 0, 1]
+VERMELHO = [1, 0, 0]
+VERDE = [0, 1, 0]
 
 # função para ligar uma linha inteira no tela led
 def ligar_linha(buraco, arvore_y):
     coluna = 0
-    while coluna < TAMANHO_LINHA:
+    while coluna < TOTAL_COLUNAS:
     # usamos um loop para ligar cada led da linha
         # usamos essa verificação para pular o led do buraco
         if coluna != buraco:
-            ligar_led(coluna, arvore_y, [0,1,0])
+            ligar_led(coluna, arvore_y, VERDE)
         # aumentamos o i para 
         coluna = coluna + 1
 
 # função para desligar uma linha inteira no tela led
 def apagar_linha(buraco, y):
     coluna = 0
-    while coluna < TAMANHO_LINHA:
+    while coluna < TOTAL_COLUNAS:
     # usamos um loop para desligar cada led da linha
         if coluna != buraco:
         # usamos essa verificação para pular o led do buraco pois o jogador pode estar nele
@@ -34,8 +40,6 @@ def apagar_linha(buraco, y):
         coluna = coluna + 1
 
 # inicializar jogador
-# criamos uma variavel para guardar a cor azul
-AZUL = [0,0,1]
 # definimos a posição inicial do jogador
 jogador_x = 2
 jogador_y = 0
@@ -63,11 +67,11 @@ ligar_linha(buraco, int(arvore_y))
 # função para apagar todos os leds
 def limpar_leds():
     coluna = 0
-    while coluna < 5:
+    while coluna < TOTAL_COLUNAS:
         # fazemos um loop para as colunas
         linha = 0
-        while linha < 5:
-            # e um loop para as linhas
+        while linha < TOTAL_LINHAS:
+            # e um loop para as colunas
             apagar_led(coluna,linha)
             linha = linha + 1
         coluna = coluna + 1
@@ -89,14 +93,14 @@ def jogador_esq():
 def jogador_direita():
     global jogador_x
     # primeiro verificamos se o jogador não está no canto direito
-    if jogador_x >= TAMANHO_LINHA - 1:
+    if jogador_x >= TOTAL_COLUNAS - 1:
         return
     # apagamos o led da posição atual do jogador
     apagar_led(jogador_x, jogador_y)
     # mudamos a posição para a direita
     jogador_x = jogador_x + 1
     # ligamos o led da nova posição do jogador
-    ligar_led(jogador_x,jogador_y,[0,0,1])
+    ligar_led(jogador_x,jogador_y, AZUL)
 
 
 # reseta os valores da arvore
@@ -174,7 +178,7 @@ def jogo(delta):
     global buraco
     # primeiro verificamos se o jogador morreu
     if morto():
-        ligar_led(jogador_x, jogador_y, [1, 0, 0])
+        ligar_led(jogador_x, jogador_y, VERMELHO)
         if not morreu:
             som_morreu()
             escrever_arquivo(HIGHSCORE_FILE, str(highscore))
