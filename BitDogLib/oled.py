@@ -5,11 +5,11 @@ from ssd1306 import SSD1306_I2C
 i2c = SoftI2C(scl=Pin(15), sda=Pin(14))
 oled = SSD1306_I2C(128, 64, i2c)
 
-def limpar_display():
+def limpar_tela():
     oled.fill(0)
 
-def escrever_display(texto, x, y):
+def escrever_tela(texto, x, y):
     oled.text(texto, x, y)
 
-def mostrar_display():
+def mostrar_tela():
     oled.show()

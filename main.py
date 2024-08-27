@@ -1,8 +1,4 @@
 from BitDogLib import *
-
-# TODO: trocar jogador_pos por jogador_x e jogador_y
-# TODO: remover += -= e outros sugar syntax se tiver
-
 # Conhecimentos necessários
 # - funções
 # - while
@@ -16,132 +12,194 @@ from BitDogLib import *
 TAMANHO_LINHA = 5
 HIGHSCORE_FILE = 'highscore.txt'
 
+# função para ligar uma linha inteira no tela led
 def ligar_linha(buraco, arvore_y):
     i = 0
     while i < TAMANHO_LINHA:
+    # usamos um loop para ligar cada led da linha
+        # usamos essa verificação para pular o led do buraco
         if i != buraco:
             ligar_led(i, arvore_y, [0,1,0])
+        # aumentamos o i para 
         i = i + 1
 
+# função para desligar uma linha inteira no tela led
 def apagar_linha(buraco, y):
     i = 0
     while i < TAMANHO_LINHA:
+    # usamos um loop para desligar cada led da linha
         if i != buraco:
+        # usamos essa verificação para pular o led do buraco pois o jogador pode estar nele
             apagar_led(i, y)
         i = i + 1
 
 # inicializar jogador
-ligar_led(2,0,[0,0,1])
-jogador_pos = [2,0]
-score = 0
-morto = False
+# criamos uma variavel para guardar a cor azul
+AZUL = [0,0,1]
+# definimos a posição inicial do jogador
+jogador_x = 2
+jogador_y = 0
+# ligamos o led com a posição do jogador
+ligar_led(jogador_x, jogador_y, AZUL) 
+# inicializamos a pontuação
+pontos = 0
+# essa variavel define se o jogador está morto ou não
+morreu = False
+# lemos o highscore
 texto_arquivo = ler_arquivo(HIGHSCORE_FILE)
 if texto_arquivo == '':
-    hiscore = 0
+    highscore = 0
 else:
-    hiscore = int(texto_arquivo)
+    highscore = int(texto_arquivo)
 
 # inicializar arvore
-arvore_gap = numero_aleatorio(0,4)
+# esolhemos um número aleatório para o buraco
+buraco = numero_aleatorio(0,4)
+# definimos a posição inicial das arvores
 arvore_y = 4.999999 # começar com 4 mostrar porque precisa .999999
-ligar_linha(arvore_gap, int(arvore_y))
+# ligamos os leds das arvores
+ligar_linha(buraco, int(arvore_y))
 
-def limpar_tela():
+# função para apagar todos os leds
+def limpar_leds():
     i = 0
     while i < 5:
+        # fazemos um loop para as linhas
         j = 0
         while j < 5:
+            # e um loop para as colunas
             apagar_led(i,j)
             j = j + 1
         i = i + 1
 
+# função para mover o jogador para a esquerda
 def jogador_esq():
-    x, y = jogador_pos
-    if x <= 0:
+    global jogador_x
+    # primeiro verificamos se o jogador não está no canto esquerdo
+    if jogador_x <= 0:
         return
-    apagar_led(x, y)
-    jogador_pos[0] -= 1
-    x, y = jogador_pos
-    ligar_led(x,y,[0,0,1])
+    # apagamos o led da posição atual do jogador
+    apagar_led(jogador_x, jogador_y)
+    # mudamos a posição para a esquerda
+    jogador_x = jogador_x - 1
+    # ligamos o led da nova posição do jogador
+    ligar_led(jogador_x, jogador_y, AZUL)
 
+# função para mover o jogador para a direita
 def jogador_direita():
-    x, y = jogador_pos
-    if x >= TAMANHO_LINHA - 1:
+    global jogador_x
+    # primeiro verificamos se o jogador não está no canto direito
+    if jogador_x >= TAMANHO_LINHA - 1:
         return
-    apagar_led(x, y)
-    jogador_pos[0] += 1
-    x, y = jogador_pos
-    ligar_led(x,y,[0,0,1])
+    # apagamos o led da posição atual do jogador
+    apagar_led(jogador_x, jogador_y)
+    # mudamos a posição para a direita
+    jogador_x = jogador_x + 1
+    # ligamos o led da nova posição do jogador
+    ligar_led(jogador_x,jogador_y,[0,0,1])
 
 
-def inicializar_arvore():
-    global arvore_gap
+# reseta os valores da arvore
+def resetar_arvore():
+    global buraco
     global arvore_y
-    global score
-    global hiscore
-    arvore_gap = numero_aleatorio(0,4)
+    global pontos
+    global highscore
+    # escolhemos um novo buraco aleatório
+    buraco = numero_aleatorio(0,4)
+    # retornamos as arvores para a parte de baixo da tela
     arvore_y = 4.999999
-    score = score + 1
-    if score > hiscore:
-        hiscore = score
+    # pontuamos o jogador por ter passado por uma fileira de arvores
+    pontos = pontos + 1
+    if pontos > highscore:
+        highscore = pontos
 
-def inicializar_jogador():
-    global jogador_pos
-    global score
-    ligar_led(2,0,[0,0,1])
-    jogador_pos = [2,0]
-    score = -1
+# reseta os valores do jogador quando ele morrer
+def resetar_jogador():
+    global jogador_x
+    global jogador_y
+    global pontos
+    # ligamos o led na posição inicial
+    ligar_led(2,0,AZUL)
+    jogador_x = 2
+    jogador_y = 0
+    # resetamos os pontos
+    pontos = 0
 
-def mover_arvore(x):
+
+def mover_arvore(tempo):
     global arvore_y
-    global arvore_gap
-    dist = x/250_000
-    apagar_linha(arvore_gap, int(arvore_y))
+    global buraco
+    # calculamos a distancia que as arvores vão mover
+    # velocidade = distância / tempo
+    # então podemos calcular a distância movida em certo tempo fazendo
+    # tempo * velocidade = distância
+    dist = tempo/250_000
+    # apagamos a linha atual
+    # usamos a função int para transformar o número quebrado da arvore_y em um inteiro
+    apagar_linha(buraco, int(arvore_y))
+    # calculamos a nova posição da arvore
+    # subtraindo a posição atual da distância movida
     arvore_y = arvore_y - dist
+    # verificamos se a arvore ainda está nos leds
     if arvore_y < 0:
-        inicializar_arvore()
+        # se a arvore já saiu dos leds vamos 
+        resetar_arvore()
         return
-    ligar_linha(arvore_gap, int(arvore_y))
+    # se a arvore não saiu dos leds ligamos os leds na nova posição
+    ligar_linha(buraco, int(arvore_y))
 
-def morreu():
-    x,y = jogador_pos
-    if x != arvore_gap and y == int(arvore_y):
+
+# verifica se o jogador está morto
+def morto():
+    # se o jogador estiver na mesma linha das arvores e não estiver na coluna do burco ele morreu
+    if jogador_x != buraco and jogador_y == int(arvore_y):
         return True
+    # caso contrario ele sobreviveu
     else:
         return False
 
+# verifica se o jogador deve ganhar pontos
 def pontuou():
-    x, y = jogador_pos
-    if y == int(arvore_y):
+    # o jogador pontua se estiver na mesma linha da arvore
+    if jogador_y == int(arvore_y):
         return True
     return False
 
+# função que define o que deve ser feito em cada loop do jogo
 def jogo(delta):
-    global score
-    global morto
-    if morreu():
-        x, y = jogador_pos
-        ligar_led(x, y, [1, 0, 0])
-        if not morto:
-            som_morreu()
-            escrever_arquivo(HIGHSCORE_FILE, str(hiscore))
-        morto = True
-        if botao_a() or botao_b():
-            morto = False
-            limpar_tela()
-            inicializar_jogador()
-            inicializar_arvore()
-        return
-    limpar_display()
-    escrever_display("score: " + str(score),0,0)
-    escrever_display("hiscore: " + str(hiscore),0,10)
-    mostrar_display()
+    global pontos
+    global morreu
     global arvore_y
-    global arvore_gap
+    global buraco
+    # primeiro verificamos se o jogador morreu
+    if morto():
+        ligar_led(jogador_x, jogador_y, [1, 0, 0])
+        if not morreu:
+            som_morreu()
+            escrever_arquivo(HIGHSCORE_FILE, str(highscore))
+        morreu = True
+        if botao_A_pressionado() or botao_B_pressionado():
+            morreu = False
+            limpar_leds()
+            resetar_arvore()
+            resetar_jogador()
+        return
+    # se ele não morreu limpamos a tela
+    limpar_tela()
+    # escrevemos novamente a pontuação para caso ela ter mudado
+    escrever_tela("score: " + str(pontos),0,0)
+    escrever_tela("hiscore: " + str(highscore),0,10)
+    mostrar_tela()
+    # movemos a arvore passando o tempo decorrido desde o última iteração
     mover_arvore(delta)
-    if botao_a():
+    # verificamos se o jogador pressionou algum botão
+    if botao_A_pressionado():
+        # se ele pressionou o botão A movemos para a equerda
         jogador_esq()
-    if botao_b():
+    if botao_B_pressionado():
+        # se ele pressionou o botão B movemos para a direita
         jogador_direita()
 
+# passamos a função jogo que criamos como variavel da função loop
 loop(jogo)
