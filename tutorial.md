@@ -280,14 +280,113 @@ Neste exemplo, ao usar global, a função `mudar_numero_para_um` modifica a vari
 
 
 # criar o jogador
-    - ligar o led
-    - mover o jogador
-    - botão
-# criar arvores
-    - ligar um led
-    - mover um led
-    - criar uma linha de leds
-    - mover uma linha de leds
+## ligar o led
+```py
+ligar_led(2, 0, [0,0,1])
+```
+como vamos mexer bastante o jogador para deixar mais fácil podemos criar variaveis para salvar os dados.
+
+```py
+AZUL = [0, 0, 1]
+jogador_x = 2
+jogador_y = 0
+ligar_led(jogador_x, jogador_y, AZUL) 
+```
+
+## mover o jogador
+para ficar fácil de mover o jogador vamos criar funções.
+![função para mover o jogador a direita](flowcharts/jogador_dir.png)
+![função para mover o jogador a esquerda](flowcharts/jogador_esq.png)
+```py
+def jogador_esq():
+    # declaramos que vamos fazer alterações na variável global
+    global jogador_x
+    # primeiro verificamos se o jogador não está no canto esquerdo
+    if jogador_x <= 0:
+        return
+    # apagamos o led da posição atual do jogador
+    apagar_led(jogador_x, jogador_y)
+    # mudamos a posição para a esquerda
+    jogador_x = jogador_x - 1
+    # ligamos o led da nova posição do jogador
+    ligar_led(jogador_x, jogador_y, AZUL)
+```
+## botão
+```py
+def jogo(delta):
+    # verificamos se o jogador pressionou algum botão
+    if botao_A_pressionado():
+        # se ele pressionou o botão A movemos para a equerda
+        jogador_esq()
+    if botao_B_pressionado():
+        # se ele pressionou o botão B movemos para a direita
+        jogador_direita()
+
+# passamos a função jogo que criamos como variavel da função loop
+loop(jogo)
+```
+
+# criar árvores
+## ligar um led
+novamente podemos criar variáveis para salvar os dados que vamos usar muitas vezes.
+```py
+VERDE = [0, 1, 0]
+arvore_x = 0
+arvore_y = 4
+ligar_led(arvore_x, arvore_y, VERDE)
+```
+## mover um led
+```py
+def mover_arvore(tempo):
+    global arvore_y
+    # calculamos a distancia que as arvores vão mover
+    # velocidade = distância / tempo
+    # então podemos calcular a distância movida em certo tempo fazendo
+    # tempo * velocidade = distância
+    dist = tempo/250_000
+    # apagamos a linha atual
+    # usamos a função int para transformar o número quebrado da arvore_y em um inteiro
+    apagar_led(arvore_x, arvore_y)
+    # calculamos a nova posição da arvore
+    # subtraindo a posição atual da distância movida
+    arvore_y = arvore_y - dist
+    # verificamos se a árvore ainda está no led
+    if arvore_y < 0:
+        # se a árvore já saiu do led vamos 
+        arvore_y = 0
+        return
+    # se a árvore não saiu dos leds ligamos o led na nova posição
+    ligar_led(arvore_x, arvore_y, VERDE)
+```
+## criar uma linha de leds
+não queremos apenas um led de árvore mas uma linha de árvores com um buraco para o jogador passar.
+![diagrama para a função](flowcharts/ligar_linha.png)
+```py
+# função para ligar uma linha inteira no tela led
+def ligar_linha(buraco, arvore_y):
+    coluna = 0
+    while coluna < TOTAL_COLUNAS:
+    # usamos um loop para ligar cada led da linha
+        # usamos essa verificação para pular o led do buraco
+        if coluna != buraco:
+            ligar_led(coluna, arvore_y, VERDE)
+        # aumentamos o i para 
+        coluna = coluna + 1
+```
+Uma função para apagar os leds também será útil.
+![diagrama para a função](flowcharts/apagar_linha.png)
+```py
+# função para desligar uma linha inteira no tela led
+def apagar_linha(buraco, y):
+    coluna = 0
+    while coluna < TOTAL_COLUNAS:
+    # usamos um loop para desligar cada led da linha
+        apagar_led(coluna, y)
+        coluna = coluna + 1
+```
+## mover uma linha de leds
+agora que temos essa funções podemos mudar o nosso código de mover árvore para mover uma linha de árvores.
+```py
     - loop de linha de leds
     - bug do .999999
     - criar um buraco mover o buraco
