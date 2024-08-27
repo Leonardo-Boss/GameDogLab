@@ -1,19 +1,10 @@
 from BitDogLib import *
-# Conhecimentos necessários
-# - funções
-# - while
-# - if
-# - variaveis
-# - escopo global e local
-# - tipos de dados
-# - lógica booleana
-# - listas
 
 TOTAL_COLUNAS = 5
 TOTAL_LINHAS = 5
 HIGHSCORE_FILE = 'highscore.txt'
 
-# criamos uma variaveis para guardar as core
+# criamos uma variaveis para guardar as cores
 AZUL = [0, 0, 1]
 VERMELHO = [1, 0, 0]
 VERDE = [0, 1, 0]
@@ -65,7 +56,7 @@ arvore_y = 4.999999 # começar com 4 mostrar porque precisa .999999
 ligar_linha(buraco, int(arvore_y))
 
 # função para apagar todos os leds
-def limpar_leds():
+def apagar_leds():
     coluna = 0
     while coluna < TOTAL_COLUNAS:
         # fazemos um loop para as colunas
@@ -115,6 +106,7 @@ def resetar_arvore():
     arvore_y = 4.999999
     # pontuamos o jogador por ter passado por uma fileira de arvores
     pontos = pontos + 1
+    # se a nova pontuação for maior que o highscore mudamos o highscore
     if pontos > highscore:
         highscore = pontos
 
@@ -123,10 +115,11 @@ def resetar_jogador():
     global jogador_x
     global jogador_y
     global pontos
-    # ligamos o led na posição inicial
-    ligar_led(2,0,AZUL)
+    # redefinimos a posição do jogador
     jogador_x = 2
     jogador_y = 0
+    # ligamos o led na posição inicial
+    ligar_led(jogador_x, jogador_y, AZUL)
     # resetamos os pontos
     pontos = 0
 
@@ -192,7 +185,7 @@ def jogo(delta):
         if botao_A_pressionado() or botao_B_pressionado():
             # mudamos o valor de morreu para falso assim vai tocar o som e salvar o pontuação novamente
             morreu = False
-            limpar_leds()
+            apagar_leds()
             resetar_arvore()
             resetar_jogador()
         # retornamos a função para não executar as partes da arvore
