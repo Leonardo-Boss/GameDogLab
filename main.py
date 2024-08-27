@@ -14,24 +14,24 @@ HIGHSCORE_FILE = 'highscore.txt'
 
 # função para ligar uma linha inteira no tela led
 def ligar_linha(buraco, arvore_y):
-    i = 0
-    while i < TAMANHO_LINHA:
+    linha = 0
+    while linha < TAMANHO_LINHA:
     # usamos um loop para ligar cada led da linha
         # usamos essa verificação para pular o led do buraco
-        if i != buraco:
-            ligar_led(i, arvore_y, [0,1,0])
+        if linha != buraco:
+            ligar_led(linha, arvore_y, [0,1,0])
         # aumentamos o i para 
-        i = i + 1
+        linha = linha + 1
 
 # função para desligar uma linha inteira no tela led
 def apagar_linha(buraco, y):
-    i = 0
-    while i < TAMANHO_LINHA:
+    linha = 0
+    while linha < TAMANHO_LINHA:
     # usamos um loop para desligar cada led da linha
-        if i != buraco:
+        if linha != buraco:
         # usamos essa verificação para pular o led do buraco pois o jogador pode estar nele
-            apagar_led(i, y)
-        i = i + 1
+            apagar_led(linha, y)
+        linha = linha + 1
 
 # inicializar jogador
 # criamos uma variavel para guardar a cor azul
@@ -62,15 +62,15 @@ ligar_linha(buraco, int(arvore_y))
 
 # função para apagar todos os leds
 def limpar_leds():
-    i = 0
-    while i < 5:
+    linha = 0
+    while linha < 5:
         # fazemos um loop para as linhas
-        j = 0
-        while j < 5:
+        coluna = 0
+        while coluna < 5:
             # e um loop para as colunas
-            apagar_led(i,j)
-            j = j + 1
-        i = i + 1
+            apagar_led(linha,coluna)
+            coluna = coluna + 1
+        linha = linha + 1
 
 # função para mover o jogador para a esquerda
 def jogador_esq():
