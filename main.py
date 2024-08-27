@@ -178,16 +178,24 @@ def jogo(delta):
     global buraco
     # primeiro verificamos se o jogador morreu
     if morto():
+        # trocamos a cor do led para mostrar que o jogador morreu
         ligar_led(jogador_x, jogador_y, VERMELHO)
+        # esta verificação é para tocar o som apenas na primeira vez que o loop rodar e o jogador estiver morto
         if not morreu:
+            # tocamos o som
             som_morreu()
+            # salvamos o novo highscore transformando o numero inteiro em texto (string)
             escrever_arquivo(HIGHSCORE_FILE, str(highscore))
+        # trocamos está variável para na próxima iteração não tocar o som de novo
         morreu = True
+        # verificamos se o jogador pressionou um botão para voltar ao jogo
         if botao_A_pressionado() or botao_B_pressionado():
+            # mudamos o valor de morreu para falso assim vai tocar o som e salvar o pontuação novamente
             morreu = False
             limpar_leds()
             resetar_arvore()
             resetar_jogador()
+        # retornamos a função para não executar as partes da arvore
         return
     # se ele não morreu limpamos a tela
     limpar_tela()
