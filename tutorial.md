@@ -1,3 +1,10 @@
+# Básico BitDogLab
+
+- **Botão**: Um interruptor que, quando pressionado, faz algo acontecer, como acender uma luz.
+- **Buzzer**: Um pequeno dispositivo que emite som quando ligado, como um alarme.
+- **Tela OLED**: Uma tela pequena e fina que pode mostrar textos ou imagens, usada em dispositivos como alguns celulares.
+- **LED**: Uma luz pequena que acende quando eletricidade passa por ela, usada para indicar coisas como se um aparelho está ligado.
+
 # Explicação de Programação em Python
 ## `def`
 
@@ -282,6 +289,7 @@ Neste exemplo, ao usar global, a função `mudar_numero_para_um` modifica a vari
 # criar o jogador
 ## ligar o led
 ```py
+from BitDogLib import * # está linha nos da acesso a funções para interagir com o BitDogLab
 ligar_led(2, 0, [0,0,1])
 ```
 como vamos mexer bastante o jogador para deixar mais fácil podemos criar variaveis para salvar os dados.
@@ -295,7 +303,26 @@ ligar_led(jogador_x, jogador_y, AZUL)
 
 ## mover o jogador
 para ficar fácil de mover o jogador vamos criar funções.
+### mover para a direita
 ![função para mover o jogador a direita](flowcharts/jogador_dir.png)
+```py
+# como vamos usar o número total de colunas varias muitas vezes vamos criar uma variável.
+TOTAL_COLUNAS = 5
+# função para mover o jogador para a direita
+def jogador_direita():
+    global jogador_x
+    # primeiro verificamos se o jogador não está no canto direito
+    if jogador_x >= TOTAL_COLUNAS - 1:
+        return
+    # apagamos o led da posição atual do jogador
+    apagar_led(jogador_x, jogador_y)
+    # mudamos a posição para a direita
+    jogador_x = jogador_x + 1
+    # ligamos o led da nova posição do jogador
+    ligar_led(jogador_x,jogador_y, AZUL)
+```
+
+### mover para a esquerda
 ![função para mover o jogador a esquerda](flowcharts/jogador_esq.png)
 ```py
 def jogador_esq():
@@ -336,6 +363,7 @@ arvore_y = 4
 ligar_led(arvore_x, arvore_y, VERDE)
 ```
 ## mover um led
+agora que acendemos um led podemos criar a função para movê-lo
 ```py
 def mover_arvore(tempo):
     global arvore_y
@@ -353,23 +381,66 @@ def mover_arvore(tempo):
     # verificamos se a árvore ainda está no led
     if arvore_y < 0:
         # se a árvore já saiu do led vamos 
-        arvore_y = 0
+        arvore_y = 4
         return
     # se a árvore não saiu dos leds ligamos o led na nova posição
     ligar_led(arvore_x, arvore_y, VERDE)
 ```
+```py
+def jogo(delta):
+    # passamos o delta que é o tempo desde a última iteração para a nossa nova função
+    mover_arvore(delta)
+
+    if botao_A_pressionado():
+        jogador_esq()
+    if botao_B_pressionado():
+        jogador_direita()
+
+loop(jogo)
+```
+## bug do .999999
+Opá, parece que tem algo errado no código a árvore não parece começar na última linha.
+Isso acontece porque o código começa com 4 então na primeira iteração ele já vai para baixo de 4 e muda de linha. Podemos resolver isso começando a linha com 4.999999 se usássemos 5 a função retornaria um erro pois o BitDogLab só tem linhas de 0 até 4.
+```py
+VERDE = [0, 1, 0]
+arvore_x = 0
+arvore_y = 4.999999
+ligar_led(arvore_x, arvore_y, VERDE)
+```
+```py
+def mover_arvore(tempo):
+    global arvore_y
+    # calculamos a distancia que as arvores vão mover
+    # velocidade = distância / tempo
+    # então podemos calcular a distância movida em certo tempo fazendo
+    # tempo * velocidade = distância
+    dist = tempo/250_000
+    # apagamos a linha atual
+    # usamos a função int para transformar o número quebrado da arvore_y em um inteiro
+    apagar_led(arvore_x, arvore_y)
+    # calculamos a nova posição da arvore
+    # subtraindo a posição atual da distância movida
+    arvore_y = arvore_y - dist
+    # verificamos se a árvore ainda está no led
+    if arvore_y < 0:
+        # se a árvore já saiu do led vamos 
+        arvore_y = 4.999999
+        return
+    # se a árvore não saiu dos leds ligamos o led na nova posição
+    ligar_led(arvore_x, arvore_y, VERDE)
+```
+
 ## criar uma linha de leds
-não queremos apenas um led de árvore mas uma linha de árvores com um buraco para o jogador passar.
+não queremos apenas um led de árvore mas uma linha de árvores.
+**função ligar_linha:**
 ![diagrama para a função](flowcharts/ligar_linha.png)
 ```py
 # função para ligar uma linha inteira no tela led
-def ligar_linha(buraco, arvore_y):
+def ligar_linha(arvore_y):
     coluna = 0
     while coluna < TOTAL_COLUNAS:
     # usamos um loop para ligar cada led da linha
-        # usamos essa verificação para pular o led do buraco
-        if coluna != buraco:
-            ligar_led(coluna, arvore_y, VERDE)
+        ligar_led(coluna, arvore_y, VERDE)
         # aumentamos o i para 
         coluna = coluna + 1
 ```
@@ -377,7 +448,7 @@ Uma função para apagar os leds também será útil.
 ![diagrama para a função](flowcharts/apagar_linha.png)
 ```py
 # função para desligar uma linha inteira no tela led
-def apagar_linha(buraco, y):
+def apagar_linha(y):
     coluna = 0
     while coluna < TOTAL_COLUNAS:
     # usamos um loop para desligar cada led da linha
@@ -385,10 +456,29 @@ def apagar_linha(buraco, y):
         coluna = coluna + 1
 ```
 ## mover uma linha de leds
-agora que temos essa funções podemos mudar o nosso código de mover árvore para mover uma linha de árvores.
+agora que temos essa funções podemos mudar o nosso código de mover árvore para mover uma linha de árvores ao invês de uma árvore só
 ```py
-    - loop de linha de leds
-    - bug do .999999
+def mover_arvore(tempo):
+    global arvore_y
+    # calculamos a distancia que as arvores vão mover
+    # velocidade = distância / tempo
+    # então podemos calcular a distância movida em certo tempo fazendo
+    # tempo * velocidade = distância
+    dist = tempo/250_000
+    # apagamos a linha atual
+    # usamos a função int para transformar o número quebrado da arvore_y em um inteiro
+    apagar_linha(int(arvore_y))
+    # calculamos a nova posição da arvore
+    # subtraindo a posição atual da distância movida
+    arvore_y = arvore_y - dist
+    # verificamos se a arvore ainda está nos leds
+    if arvore_y < 0:
+        # se a arvore já saiu dos leds vamos 
+        resetar_arvore()
+        return
+    # se a arvore não saiu dos leds ligamos os leds na nova posição
+    ligar_linha(int(arvore_y))
+```
     - criar um buraco mover o buraco
     - cuidar para o jogador conseguir passar pelo buraco
 # adicionar morte
@@ -401,36 +491,3 @@ agora que temos essa funções podemos mudar o nosso código de mover árvore pa
     - printar tela oled
     - adicionar highscore
     - salvar highscore em arquivo
-
-# Básico Programação
-
-- **Funções**: São como receitas que guardam um conjunto de instruções. Você "chama" a função para repetir essas instruções sempre que precisar.
-- **While**: Um loop que continua repetindo um bloco de código enquanto uma condição for verdadeira, como repetir algo até você dizer "pare".
-- **If**: Um comando que faz o programa tomar decisões. Se algo for verdadeiro, ele faz uma coisa; se não, faz outra.
-- **Variáveis**: Caixinhas onde você guarda informações que quer usar mais tarde, como números, palavras, etc.
-- **Escopo Global e Local**: Global é quando algo pode ser usado em qualquer lugar do programa. Local é quando algo só pode ser usado dentro de uma parte específica, como dentro de uma função.
-- **Tipos de Dados**: Diferentes formas de guardar informações, como números, textos, ou listas.
-- **Listas**: São como caixas que guardam várias coisas de uma vez, como uma lista de compras onde cada item é guardado em uma posição específica.
-A **lógica booleana** é como o jeito que os computadores tomam decisões simples, baseadas em "sim" ou "não". Em programação, isso é representado por **verdadeiro** (True) ou **falso** (False).
-
-Imagine que você tem uma pergunta simples, como "Está chovendo?". A resposta pode ser apenas "sim" ou "não". Na lógica booleana, essas respostas são representadas como:
-
-- **True** (Verdadeiro) para "sim"
-- **False** (Falso) para "não"
-
-Além disso, a lógica booleana usa operadores para combinar várias condições:
-
-- **AND**: Ambos têm que ser verdadeiros. Exemplo: "Está chovendo **e** você tem um guarda-chuva?" (Ambos precisam ser True para a resposta ser True.)
-- **OR**: Pelo menos um tem que ser verdadeiro. Exemplo: "Está chovendo **ou** está nublado?" (Se um for True, a resposta é True.)
-- **NOT**: Inverte o valor. Exemplo: "Não está chovendo" (Se estiver chovendo (True), o NOT transforma isso em False.)
-
-A lógica booleana ajuda os computadores a tomar decisões de forma simples e eficiente, baseando-se em condições que podem ser verdadeiras ou falsas.
-
-# Básico BitDogLab
-
-- **Botão**: Um interruptor que, quando pressionado, faz algo acontecer, como acender uma luz.
-- **Buzzer**: Um pequeno dispositivo que emite som quando ligado, como um alarme.
-- **Tela OLED**: Uma tela pequena e fina que pode mostrar textos ou imagens, usada em dispositivos como alguns celulares.
-- **LED**: Uma luz pequena que acende quando eletricidade passa por ela, usada para indicar coisas como se um aparelho está ligado.
-
-
