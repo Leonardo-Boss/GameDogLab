@@ -5,7 +5,7 @@ import random
 def ler_arquivo(nome):
     try:
         with open(nome, 'r') as f:
-            mensagem = int(f.read())
+            mensagem = f.read()
     except:
        mensagem  = ''
     return mensagem
@@ -23,8 +23,14 @@ def tempo_de_jogo(old):
     old = new
     return (delta, old)
 
+import sys
 def loop(func):
     old = ticks_us()
     while True:
         delta, old = tempo_de_jogo(old)
-        func(delta)
+        try:
+            func(delta)
+        except Exception as e:
+            with open('error.log', 'w') as f:
+                sys.print_exception(e, f)
+            sys.exit('error')
