@@ -2,6 +2,10 @@
 Nesta atividade os alunos desenvolvem um jogo simples e divertido, na BitDogLab ensinando de modo prático a programação.
 
 ## Itens BNCC
+- EF69CO02:
+Elaborar algoritmos que envolvam instruções sequenciais, de repetição e de seleção usando uma linguagem de programação.
+- EF69CO04:
+Construir soluções de problemas usando a técnica de decomposição e automatizar tais soluções usando uma linguagem de programação. 
 
 ## Conhecimentos de Python/Programação necessários
 Para desenvolver essa atividade alguns conceitos de python e programação são necessários.
