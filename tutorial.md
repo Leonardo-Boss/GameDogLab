@@ -508,7 +508,7 @@ pontos = 0
 ```
 Queremos subir os pontos toda vez que o jogador passar uma linha de arvores.
 Então o melhor lugar para fazer isso é na função resetar_arvore que é chamada toda vez que as árvores chegam no jogador.
-![resetar arvore](flowcharts/resetar_arvore.png)
+![resetar arvore](flowcharts/resetar_arvore_sem_pontos.png)
 
 ```py
 # reseta os valores da arvore
@@ -594,6 +594,7 @@ pontos = 0
 highscore = 0
 ```
 agora quando alteramos os pontos vamos verificar se os pontos são maiores que o HighScore.
+![resetar arvore](flowcharts/resetar_arvore.png)
 ```py
 # reseta os valores da arvore
 def resetar_arvore():
