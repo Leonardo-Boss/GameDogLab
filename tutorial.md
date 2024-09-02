@@ -1,10 +1,19 @@
+# Jogo do Esquiador
+O BitDog foi esquiar mas sem querer confundiu a pista de inciante com a pista de profissional.
+A pista de profissional tem um monte de arvores que o BitDog precisa desviar.
+
+Vamos fazer um jogo dessa história.
+
+A estrutura do jogo vai ser como do diagrama abaixo.
+![chart](flowcharts/baixo_nivel.png)
+
 # criar o jogador
 ## ligar o led
 ```py
 from BitDogLib import * # está linha nos da acesso a funções para interagir com o BitDogLab
 ligar_led(2, 0, [0,0,1])
 ```
-como vamos mexer bastante o jogador para deixar mais fácil podemos criar variaveis para salvar os dados.
+como vamos mexer bastante o jogador para deixar mais fácil podemos criar variáveis para salvar os dados.
 
 ```py
 AZUL = [0, 0, 1]
@@ -66,6 +75,9 @@ loop(jogo)
 ```
 
 # criar árvores
+O código vai seguir esse diagrama.
+![arvores](flowcharts/mover_arvore.png)
+
 ## ligar um led
 novamente podemos criar variáveis para salvar os dados que vamos usar muitas vezes.
 ```py
@@ -496,6 +508,8 @@ pontos = 0
 ```
 Queremos subir os pontos toda vez que o jogador passar uma linha de arvores.
 Então o melhor lugar para fazer isso é na função resetar_arvore que é chamada toda vez que as árvores chegam no jogador.
+![resetar arvore](flowcharts/resetar_arvore.png)
+
 ```py
 # reseta os valores da arvore
 def resetar_arvore():
@@ -552,6 +566,9 @@ def jogo(delta):
 ## resetar os pontos
 Parece que esquecemos de resetar os pontos para não subir sem parar.
 Vamos adicionar isso na função resetar jogador já que queremos limpar os pontos todas as vezes que o jogador resetar o jogo.
+
+![jogador](flowcharts/resetar_jogador.png)
+
 ```py
 # reseta os valores do jogador quando ele morrer
 def resetar_jogador():
