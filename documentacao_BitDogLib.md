@@ -5,6 +5,7 @@ Parâmetros:
 - y: qual a linha do led que você quer ligar pode ser de 0 até 4
 - cor: [R,G,B] uma lista com os valores de vermelho, verde e azul.
     - cada cor pode ser de 0 até 255.
+
 observação: o ponto (0,0) é no canto superior esquerdo.
 ![matriz](imagens/matriz_de_leds.png)
 ## apagar_led(x, y)
@@ -21,6 +22,7 @@ Essa função adiciona textos que vão aparecer na tela quando usar a função m
 - texto: o texto que você quer que apareça
 - x: a coluna onde o texto começa
 - y: a linha onde o texto começa
+
 observação: o ponto 0,0 é no canto superior esquerdo da tela
 ## mostrar_tela()
 Essa função exibe os textos adicionado na tela
